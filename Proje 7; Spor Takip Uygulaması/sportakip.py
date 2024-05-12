@@ -356,17 +356,20 @@ class AnaUygulama(QMainWindow):
 
             program_label = QLabel("Program:")
             layout.addWidget(program_label)
-            program_combo = QComboBox()
+            self.program_combo = QComboBox()
             program_bilgileri = sporcu.program_bilgileri_getir()
-            program_combo.addItems(program_bilgileri)
-            layout.addWidget(program_combo)
+            self.program_combo.addItems(program_bilgileri)
+            layout.addWidget(self.program_combo)
 
-            rapor_label = QLabel("")
-            layout.addWidget(rapor_label)
+            self.rapor_label = QLabel("")
+            layout.addWidget(self.rapor_label)
 
-            rapor_button = QPushButton("Rapor Göster")
-            rapor_button.clicked.connect(lambda: self.rapor_goster(program_combo.currentText(), rapor_label))
-            layout.addWidget(rapor_button)
+            self.program_combo.currentTextChanged.connect(
+                lambda: self.rapor_goster(self.program_combo.currentText(), self.rapor_label))
+
+            onayla_butonu = QPushButton("Önceki Sayfaya Dön")
+            onayla_butonu.clicked.connect(dialog.accept)
+            layout.addWidget(onayla_butonu)
 
             dialog.exec_()
         else:
