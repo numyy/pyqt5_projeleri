@@ -38,3 +38,6 @@ Eğer herhangi bir hata, gelişme veya özellik talebi varsa, lütfen bir "Issue
 ## Lisans
 
 Bu proje [MIT Lisansı](https://opensource.org/licenses/MIT) altında lisanslanmıştır.
+
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/caffb17c-f87d-40c4-8e8e-582709530bc5)
+
