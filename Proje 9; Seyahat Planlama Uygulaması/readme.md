@@ -40,6 +40,6 @@ Bu proje MIT Lisansı altında lisanslanmıştır. Ayrıntılı bilgi için `LIC
 
 ## Uygulama görselleri
 
-![image](https://github.com/flydedit/pyqt5projeler/assets/95934599/9edc64b7-5296-4a3a-8fe3-4845056a8cb6)
-![image](https://github.com/flydedit/pyqt5projeler/assets/95934599/b1cfa5b7-7036-49cb-a951-49222bb9b708)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/92c90c40-bdfb-42c1-a459-a142fc7d260d)
+
 
