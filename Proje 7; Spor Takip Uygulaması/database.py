@@ -51,7 +51,7 @@ class VeriTabani:
 
     def antrenman_programlari_tablosu_olustur(self):
         self.imlec.execute("""CREATE TABLE IF NOT EXISTS antrenman_programlari
-                              (program_adi TEXT PRIMARY KEY, sporcu_ad TEXT, sporcu_soyad TEXT, spor_dali TEXT, antrenman_suresi INTEGER)""")
+                              (program_adi TEXT, sporcu_ad TEXT, sporcu_soyad TEXT, spor_dali TEXT, antrenman_suresi INTEGER)""")
         self.baglanti.commit()
 
     def antrenman_programi_ekle(self, program_adi, sporcu_ad, sporcu_soyad, spor_dali, antrenman_suresi):
@@ -69,5 +69,6 @@ class VeriTabani:
             "SELECT program_adi, sporcu_ad, sporcu_soyad, spor_dali, antrenman_suresi FROM antrenman_programlari")
         return self.imlec.fetchall()
 
+    
     def baglanti_kapat(self):
         self.baglanti.close()
