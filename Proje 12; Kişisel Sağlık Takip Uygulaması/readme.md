@@ -19,10 +19,12 @@ Bu Python projesi, kullanıcıların sağlık verilerini kaydedebilmelerine, egz
 
 ##Uygulama Resimleri
 
-![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/b73365db-f550-4b60-a33e-a7463be19a06)
-![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/5834e2c3-c830-4863-859b-6f80d297678b)
-![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/28a218b4-1634-4a86-9cb2-b83b603b4dd1)
-![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/e986cb2f-d231-497b-8a4d-147ba0b8fcc8)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/f1c95ec6-a357-4560-bd6a-50c7fd779592)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/45bb3804-f394-4ee5-83e6-85a010a13b52)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/38083cdc-08a0-4301-8656-14dd7b74bbb9)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/bffa39a7-9c40-420c-880b-b49f0d1808ef)
+
+
 
 
 
