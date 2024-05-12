@@ -105,6 +105,10 @@ class AnaPencere(QMainWindow):
         buton_layout.addWidget(self.proje_olustur_butonu)
         self.proje_olustur_butonu.clicked.connect(self.proje_olustur)
 
+        self.proje_sil_butonu = QPushButton("Proje Sil")
+        buton_layout.addWidget(self.proje_sil_butonu)
+        self.proje_sil_butonu.clicked.connect(self.proje_sil)
+
         self.gorev_olustur_butonu = QPushButton("Görev Oluştur")
         buton_layout.addWidget(self.gorev_olustur_butonu)
         self.gorev_olustur_butonu.clicked.connect(self.gorev_olustur)
@@ -182,7 +186,7 @@ class AnaPencere(QMainWindow):
         isim, durum = QInputDialog.getText(self, "Sorumlu Ekle", "Sorumlu İsmini ve Soyismini Girin:")
         if durum and isim:
             rol, durum = QInputDialog.getItem(self, "Sorumlu Rolü", "Rolü Seçin:",
-                                              ["Geliştirici", "Tasarımcı", "Proje Yöneticisi"], 0, False)
+                                              ["Geliştirici", "Analist", "Test Uzmanı", "Sistem Yöneticisi", "Proje Yöneticisi"], 0, False)
             if durum:
                 yeni_sorumlu = Calisan(isim, rol)
                 self.sorumlular.append(yeni_sorumlu)
@@ -217,11 +221,14 @@ class AnaPencere(QMainWindow):
                 departman, durum = QInputDialog.getText(self, "Çalışan Ekle", "Departman:")
                 if durum and departman:
                     rol, durum = QInputDialog.getItem(self, "Çalışan Ekle", "Rol:",
-                                                      ["Geliştirici", "Tasarımcı", "Proje Yöneticisi"], 0, False)
+                                                      ["Geliştirici", "Tasarımcı", "Analist",
+                                                       "Test Uzmanı", "Operatör", "Sistem Yöneticisi", "İş Analizcisi",
+                                                       "Veri Bilimcisi", "Ağ Uzmanı", "Siber Güvenlik Uzmanı",
+                                                       "Teknik Yazılımcı", "DevOps Mühendisi", "Mobil Geliştirici",
+                                                       "Gömülü Yazılım Geliştirici", "UI/UX Tasarımcısı"], 0, False)
                     if durum:
                         self.calisan_yonetimi.calisan_ekle(isim, soyisim, departman, rol)
                         self.calisan_tablosu_guncelle()
-
     def calisan_sil(self):
         calisanlar = self.calisan_yonetimi.calisanlari_getir()
         if calisanlar:
@@ -256,3 +263,12 @@ class AnaPencere(QMainWindow):
                 self.tablo.setItem(i, 6, QTableWidgetItem(calisan_adi))
                 self.tablo.setItem(i, 7, QTableWidgetItem(gorev.durum))
                 break
+
+    def proje_sil(self):
+        secili_proje = self.tablo.currentRow()
+        if secili_proje >= 0:
+            cevap = QMessageBox.question(self, "Proje Sil", "Seçili projeyi silmek istediğinizden emin misiniz?",
+                                         QMessageBox.Yes | QMessageBox.No)
+            if cevap == QMessageBox.Yes:
+                self.projeler.pop(secili_proje)
+                self.tablo.removeRow(secili_proje)
