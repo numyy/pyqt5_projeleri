@@ -45,12 +45,8 @@ Bu proje, Python ve PyQt5 kütüphanesi kullanılarak geliştirilmiş bir Çevri
 
 ## Uygulama görselleri
 
-![image](https://github.com/Omercoskun77/PyQt-Projeleri/assets/167522812/6208508b-46d0-431e-8469-649b090ee38b)
-![image](https://github.com/Omercoskun77/PyQt-Projeleri/assets/167522812/c89e93ae-8f6e-4f0c-b0a0-e69346dc5a33)
-![image](https://github.com/Omercoskun77/PyQt-Projeleri/assets/167522812/80b0e20a-1758-4296-b582-12194d65f437)
-![image](https://github.com/Omercoskun77/PyQt-Projeleri/assets/167522812/8a7d0956-d74e-477b-bade-f8855a92b382)
-![image](https://github.com/Omercoskun77/PyQt-Projeleri/assets/167522812/0372853b-5bf7-49dc-b724-2e994a1fb17f)
-
-
-
-
+![image](https://github.com/Omercoskun77/PyQt5-Projeleri/assets/167522812/dc5b8976-c7cf-43e3-9102-761c451610ba)
+![image](https://github.com/Omercoskun77/PyQt5-Projeleri/assets/167522812/98923bdd-0c20-4004-afcd-a7d740c7107f)
+![image](https://github.com/Omercoskun77/PyQt5-Projeleri/assets/167522812/1d818d00-f086-4bde-8029-0baaa32430f7)
+![image](https://github.com/Omercoskun77/PyQt5-Projeleri/assets/167522812/d0be3565-cf50-4474-a3ea-0667afbf846b)
+![image](https://github.com/Omercoskun77/PyQt5-Projeleri/assets/167522812/da1ca1d6-2f86-4185-8545-7b533484c6e8)
