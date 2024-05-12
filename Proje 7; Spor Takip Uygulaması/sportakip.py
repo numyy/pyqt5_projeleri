@@ -1,7 +1,7 @@
+from database import VeriTabani
 import sys
-import random
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QListWidget, QHBoxLayout, QStackedWidget, QMessageBox
-from PyQt5.QtCore import Qt, QRegExp
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QListWidget, QHBoxLayout, QMessageBox, QDialog
+from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
 
 class Sporcu:
@@ -12,30 +12,90 @@ class Sporcu:
         self.yas = yas
         self.antrenman_programlari = []
         self.ilerleme_yuzdesi = 0
+        self.veritabani = VeriTabani()  # Veritabanı nesnesi oluştur
+        self.sporcular = self.veritabani.sporcular_getir()
+        self.sporcular_list = QListWidget()  # Sporcular listesi için QListWidget nesnesi
+        self.sporcular_listesini_guncelle()  # Başlangıçta listeyi doldur
 
-    def program_olustur(self, program_adi):
-        program = AntrenmanProgrami(program_adi)
+    def sporcular_listesini_guncelle(self):
+        self.sporcular_list.clear()
+        self.sporcular = self.veritabani.sporcular_getir()
+        self.sporcular_list.addItems([f"{ad} {soyad} - {spor_dali} - {yas} - {spor_dali}" for ad, soyad, spor_dali, yas in self.sporcular])
+
+    def program_olustur(self, program_adi, spor_dali, antrenman_suresi):
+        program = AntrenmanProgrami(program_adi, spor_dali, antrenman_suresi)
         self.antrenman_programlari.append(program)
+        self.veritabani.antrenman_programi_ekle(program_adi, self.ad, self.soyad, spor_dali, antrenman_suresi)
         return program
 
     def ilerleme_kaydet(self, program, antrenman, ilerleme):
         takip = Takip(self, antrenman, ilerleme)
         program.takip_listesi.append(takip)
 
-    def rapor_al(self, program):
-        rapor = "Sporcu: {0} {1}\nSpor Dalı: {2}\nAntrenman Programı: {3}\n\nTakip Bilgileri:\n".format(
-            self.ad, self.soyad, self.spor_dali, program.program_adi)
-        for takip in program.takip_listesi:
-            rapor += "Antrenman: {0}\nİlerleme: {1}\n".format(
-                takip.antrenman.antrenman_adi, takip.ilerleme_kaydi)
+    def rapor_al(self, program_adi):
+        rapor = ""
+        for program in self.antrenman_programlari:
+            if program.program_adi == program_adi:
+                rapor += str(program) + "\n\nAntrenmanlar:\n"
+                for antrenman in program.antrenmanlar:
+                    rapor += f"- {antrenman.antrenman_adi}\n  Detaylar: {antrenman.detaylar}\n  Süre: {antrenman.sure} saat\n"
+                rapor += "\nTakip Bilgileri:\n"
+                for takip in program.takip_listesi:
+                    rapor += "Antrenman: {0}\nİlerleme: {1}\n".format(
+                        takip.antrenman.antrenman_adi, takip.ilerleme_kaydi)
+                break
         return rapor
 
 
+    def ilerleme_kaydet_dialog(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("İlerleme Kaydet")
+        layout = QVBoxLayout()
+        dialog.setLayout(layout)
+
+        program_label = QLabel("Program:")
+        layout.addWidget(program_label)
+        program_combo = QComboBox()
+        program_combo.addItems([program.program_adi for program in self.antrenman_programlari])
+        layout.addWidget(program_combo)
+
+        antrenman_label = QLabel("Antrenman:")
+        layout.addWidget(antrenman_label)
+        antrenman_combo = QComboBox()
+        layout.addWidget(antrenman_combo)
+
+        ilerleme_label = QLabel("İlerleme:")
+        layout.addWidget(ilerleme_label)
+        ilerleme_edit = QLineEdit()
+        layout.addWidget(ilerleme_edit)
+
+        kaydet_button = QPushButton("Kaydet")
+        kaydet_button.clicked.connect(
+            lambda: self.ilerleme_kaydet(program_combo.currentText(), antrenman_combo.currentText(),
+                                         ilerleme_edit.text()))
+        layout.addWidget(kaydet_button)
+
+        dialog.exec_()
+
+    def rapor_goster(self, program_bilgisi, rapor_label):
+        program_adi, ad_soyad, spor_dali, antrenman_suresi = program_bilgisi.split(" - ")
+        ad, soyad = ad_soyad.split()
+        sporcu = self.get_sporcu(ad, soyad)
+        for program in sporcu.antrenman_programlari:
+            if program.program_adi == program_adi:
+                rapor_label.setText(sporcu.rapor_al(program))
+                break
+
 class AntrenmanProgrami:
-    def __init__(self, program_adi):
+    def __init__(self, program_adi, spor_dali, antrenman_suresi):
         self.program_adi = program_adi
+        self.spor_dali = spor_dali
+        self.antrenman_suresi = antrenman_suresi
         self.antrenmanlar = []
         self.takip_listesi = []
+
+    def __str__(self):
+        return f"Program Adı: {self.program_adi}\nSpor Dalı: {self.spor_dali}\nAntrenman Süresi: {self.antrenman_suresi} saat"
 
     def antrenman_ekle(self, antrenman_adi, detaylar, sure):
         antrenman = Antrenman(antrenman_adi, detaylar, sure)
@@ -67,78 +127,118 @@ class AnaUygulama(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Spor Takip Uygulaması")
-        self.sporcular = {}
+        self.veritabani = VeriTabani()
+        self.sporcular = self.veritabani.sporcular_getir()  # Veritabanından sporcuları al
         self.setup_ui()
+        self.sporcular_listesini_guncelle()  # Başlangıçta listeyi doldur
 
     def setup_ui(self):
-        # Ana widget
         ana_widget = QWidget()
         self.setCentralWidget(ana_widget)
 
-        # Dikey layout
         v_layout = QVBoxLayout()
         ana_widget.setLayout(v_layout)
 
-        # Sporcu bilgileri
         sporcu_bilgileri_label = QLabel("Sporcu Bilgileri")
         v_layout.addWidget(sporcu_bilgileri_label)
 
         h_layout = QHBoxLayout()
         v_layout.addLayout(h_layout)
 
-        # Ad ve Soyad
         self.ad_soyad_line_edit = QLineEdit()
         self.ad_soyad_line_edit.setPlaceholderText("Ad Soyad")
         self.ad_soyad_line_edit.setValidator(QRegExpValidator(QRegExp(r'^[a-zA-Z\s]+$'), self.ad_soyad_line_edit))
         self.ad_soyad_line_edit.textChanged.connect(self.ad_soyad_degistir)
         h_layout.addWidget(self.ad_soyad_line_edit)
 
-        # Yaş
         self.yas_line_edit = QLineEdit()
         self.yas_line_edit.setPlaceholderText("Yaş")
         self.yas_line_edit.setValidator(QRegExpValidator(QRegExp(r'^[1-9][0-9]?$|^100$'), self.yas_line_edit))
         self.yas_line_edit.textChanged.connect(self.yas_degistir)
         h_layout.addWidget(self.yas_line_edit)
 
-        # Spor Dalı
         self.spor_dali_combo = QComboBox()
         self.spor_dali_combo.addItems(["Futbol", "Basketbol", "Yüzme", "Koşu"])
         h_layout.addWidget(self.spor_dali_combo)
 
-        # Sporcu Ekle Butonu
         sporcu_ekle_butonu = QPushButton("Sporcu Ekle")
         sporcu_ekle_butonu.clicked.connect(self.sporcu_ekle)
         h_layout.addWidget(sporcu_ekle_butonu)
 
-        # Sporcular Listesi
         self.sporcular_list = QListWidget()
         v_layout.addWidget(self.sporcular_list)
 
-        # Devam Et Butonu
         self.devam_et_butonu = QPushButton("Devam Et")
         self.devam_et_butonu.clicked.connect(self.degistir_sayfa)
         v_layout.addWidget(self.devam_et_butonu)
 
-        # Sayfa Görüntüleme
-        self.stacked_widget = QStackedWidget()
-        v_layout.addWidget(self.stacked_widget)
+    def sporcular_listesini_guncelle(self):
+        self.sporcular_list.clear()
+        self.sporcular = self.veritabani.sporcular_getir()
+        self.sporcular_list.addItems([f"{ad} {soyad} - {yas} - {spor_dali}" for ad, soyad, spor_dali, yas in self.sporcular])
 
-        # İlk Sayfa (Sporcu Ekleme)
-        ilk_sayfa = QWidget()
-        ilk_sayfa_layout = QVBoxLayout()
-        ilk_sayfa.setLayout(ilk_sayfa_layout)
+    def sporcu_ekle(self):
+        ad_soyad = self.ad_soyad_line_edit.text()
+        yas = self.yas_line_edit.text()
+        spor_dali = self.spor_dali_combo.currentText()
 
-        self.stacked_widget.addWidget(ilk_sayfa)
+        if ad_soyad and yas and spor_dali:
+            ad_soyad_list = ad_soyad.split()
+            if len(ad_soyad_list) < 2:
+                QMessageBox.warning(self, "Uyarı", "Lütfen ad ve soyad girin.")
+            else:
+                ad, soyad = ad_soyad_list
+                self.veritabani.sporcu_ekle(ad, soyad, spor_dali, int(yas))
+                self.sporcular_listesini_guncelle()  # Listeyi güncelle
+                self.ad_soyad_line_edit.clear()
+                self.yas_line_edit.clear()
 
-        # İkinci Sayfa (Sporcuların Gösterimi)
-        ikinci_sayfa = QWidget()
-        ikinci_sayfa_layout = QVBoxLayout()
-        ikinci_sayfa.setLayout(ikinci_sayfa_layout)
+    def degistir_sayfa(self):
+        secili_item = self.sporcular_list.currentItem()
+        if secili_item:
+            secili_sporcu = secili_item.text().split(" - ")
+            ad_soyad, yas, spor_dali = secili_sporcu
 
-        self.sporcular_listesi = QListWidget()
-        ikinci_sayfa_layout.addWidget(self.sporcular_listesi)
+            self.sporcu_bilgi_penceresi = QDialog(self)
+            self.sporcu_bilgi_penceresi.setWindowTitle("Sporcu Bilgileri")
+            layout = QVBoxLayout()
+            self.sporcu_bilgi_penceresi.setLayout(layout)
 
-        self.stacked_widget.addWidget(ikinci_sayfa)
+            ad, soyad = ad_soyad.split()  # ad ve soyadı ayır
+            ad_soyad_label = QLabel(f"Ad Soyad: {ad} {soyad}")
+            yas_label = QLabel(f"Yaş: {yas}")
+            spor_dali_label = QLabel(f"Spor Dalı: {spor_dali}")
+
+            layout.addWidget(ad_soyad_label)
+            layout.addWidget(yas_label)
+            layout.addWidget(spor_dali_label)
+
+            # Buton ekleme
+            program_olustur_button = QPushButton("Program Oluştur")
+            program_olustur_button.clicked.connect(self.program_olustur_dialog)
+            layout.addWidget(program_olustur_button)
+
+            ilerleme_kaydet_button = QPushButton("İlerleme Kaydet")
+            ilerleme_kaydet_button.clicked.connect(lambda: self.get_sporcu(ad, soyad).ilerleme_kaydet_dialog())
+            layout.addWidget(ilerleme_kaydet_button)
+
+            rapor_al_button = QPushButton("Rapor Al")
+            rapor_al_button.clicked.connect(self.rapor_al_dialog)
+            layout.addWidget(rapor_al_button)
+
+            onayla_butonu = QPushButton("Ana Sayfaya Dön")
+            onayla_butonu.clicked.connect(self.sporcu_bilgi_penceresi.accept)
+            layout.addWidget(onayla_butonu)
+
+            self.sporcu_bilgi_penceresi.show()
+        else:
+            QMessageBox.warning(self, "Uyarı", "Lütfen önce bir sporcu seçin.")
+
+    def get_sporcu(self, ad, soyad):
+        for sporcu in self.sporcular:
+            if sporcu[0] == ad and sporcu[1] == soyad:
+                return Sporcu(ad, soyad, sporcu[2], sporcu[3])
+
 
     def ad_soyad_degistir(self, text):
         if any(char.isdigit() for char in text):
@@ -146,6 +246,8 @@ class AnaUygulama(QMainWindow):
             QMessageBox.warning(self, "Uyarı", "Lütfen sadece harf girin.")
 
     def yas_degistir(self, text):
+        if text == "":
+            return
         if not text.isdigit() or not (1 <= int(text) <= 100):
             self.yas_line_edit.clear()
             QMessageBox.warning(self, "Uyarı", "Lütfen 1-100 arasında bir yaş girin.")
@@ -156,24 +258,94 @@ class AnaUygulama(QMainWindow):
         spor_dali = self.spor_dali_combo.currentText()
 
         if ad_soyad and yas and spor_dali:
+            ad_soyad_list = ad_soyad.split()
+            if len(ad_soyad_list) < 2:
+                QMessageBox.warning(self, "Uyarı", "Lütfen ad ve soyad girin.")
+            else:
+                ad, soyad = ad_soyad_list
+                self.veritabani.sporcu_ekle(ad, soyad, spor_dali, int(yas))
+                self.sporcular = self.veritabani.sporcular_getir()
+                self.sporcular_list.clear()
+                self.sporcular_list.addItems([f"{ad} {soyad} - {yas} - {spor_dali}" for ad, soyad, spor_dali, yas in self.sporcular])
+                self.ad_soyad_line_edit.clear()
+                self.yas_line_edit.clear()
+
+    def program_olustur_dialog(self):
+        secili_item = self.sporcular_list.currentItem()
+        if secili_item:
+            secili_sporcu = secili_item.text().split(" - ")
+            ad_soyad, yas, spor_dali = secili_sporcu
             ad, soyad = ad_soyad.split()
-            sporcu = Sporcu(ad, soyad, spor_dali, int(yas))
-            self.sporcular["{0} {1}".format(ad, soyad)] = sporcu
-            self.sporcular_list.addItem("{0} {1} - {2} - {3}".format(ad, soyad, spor_dali, yas))
-            self.ad_soyad_line_edit.clear()
-            self.yas_line_edit.clear()
+            sporcu = self.get_sporcu(ad, soyad)
 
-    def program_olustur(self):
-        secili_sporcu_adi = self.sporcular_list.currentItem().text().split(" - ")[0]
-        sporcu = self.sporcular[secili_sporcu_adi]
-        program_adi = self.program_adi_line_edit.text()
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Program Oluştur")
+            layout = QVBoxLayout()
+            dialog.setLayout(layout)
 
-        if program_adi:
-            program = sporcu.program_olustur(program_adi)
-            self.program_adi_line_edit.clear()
-            # Burası antrenman ekleme, güncelleme, silme ve ilerleme kaydı için geliştirilecek
+            program_adi_label = QLabel("Program Adı:")
+            layout.addWidget(program_adi_label)
+            program_adi_edit = QLineEdit()
+            layout.addWidget(program_adi_edit)
 
-    # Diğer metodlar...
+            spor_dali_label = QLabel("Spor Dalı:")
+            layout.addWidget(spor_dali_label)
+            spor_dali_combo = QComboBox()
+            spor_dali_combo.addItems(["Futbol", "Basketbol", "Yüzme", "Koşu"])
+            layout.addWidget(spor_dali_combo)
+
+            antrenman_suresi_label = QLabel("Antrenman Süresi (saat):")
+            layout.addWidget(antrenman_suresi_label)
+            antrenman_suresi_edit = QLineEdit()
+            layout.addWidget(antrenman_suresi_edit)
+
+            kaydet_button = QPushButton("Kaydet")
+            kaydet_button.clicked.connect(
+                lambda: self.program_olustur(sporcu, program_adi_edit.text(), spor_dali_combo.currentText(),
+                                             int(antrenman_suresi_edit.text())))
+            layout.addWidget(kaydet_button)
+
+            dialog.exec_()
+        else:
+            QMessageBox.warning(self, "Uyarı", "Lütfen önce bir sporcu seçin.")
+
+    def rapor_al_dialog(self):
+        secili_item = self.sporcular_list.currentItem()
+        if secili_item:
+            secili_sporcu = secili_item.text().split(" - ")
+            ad_soyad, yas, spor_dali = secili_sporcu
+            ad, soyad = ad_soyad.split()
+            sporcu = self.get_sporcu(ad, soyad)
+
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Rapor Al")
+            layout = QVBoxLayout()
+            dialog.setLayout(layout)
+
+            program_label = QLabel("Program:")
+            layout.addWidget(program_label)
+            program_combo = QComboBox()
+            program_combo.addItems([program.program_adi for program in sporcu.antrenman_programlari])
+            layout.addWidget(program_combo)
+
+            rapor_label = QLabel("")
+            layout.addWidget(rapor_label)
+
+            rapor_button = QPushButton("Rapor Al")
+            rapor_button.clicked.connect(lambda: rapor_label.setText(sporcu.rapor_al(program_combo.currentText())))
+            layout.addWidget(rapor_button)
+
+            dialog.exec_()
+        else:
+            QMessageBox.warning(self, "Uyarı", "Lütfen önce bir sporcu seçin.")
+
+    def program_olustur(self, sporcu, program_adi, spor_dali, antrenman_suresi):
+        program = sporcu.program_olustur(program_adi, spor_dali, antrenman_suresi)
+        self.veritabani.antrenman_programi_ekle(program_adi, sporcu.ad, sporcu.soyad, spor_dali, antrenman_suresi)
+        QMessageBox.information(self, "Bilgi", f"{program_adi} programı başarıyla oluşturuldu.")
+        dialog = self.findChild(QDialog)
+        if dialog:
+            dialog.done(QDialog.Accepted)
 
 if __name__ == "__main__":
     import sys
