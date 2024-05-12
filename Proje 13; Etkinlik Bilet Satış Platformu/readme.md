@@ -1,44 +1,44 @@
 # Etkinlik ve Bilet Satış Platformu
 
-Bu proje, bir etkinlik yönetim sistemini Python ve PyQt5 kütüphanesi kullanarak geliştirmektedir. Kullanıcılar, yeni etkinlikler ekleyebilir, etkinliklere bilet satabilir ve etkinliklere katılım sağlayabilir.
+Bu proje, Python ve PyQt5 kütüphanesi kullanılarak geliştirilmiş bir Etkinlik ve Bilet Satış Platformu uygulamasıdır. Kullanıcılar bu platform aracılığıyla etkinlikleri görüntüleyebilir, yeni etkinlikler oluşturabilir, bilet satın alabilir ve kendi biletlerini yönetebilir.
 
-## Sınıflar
+## Özellikler
 
-### Etkinlik
+- Kullanıcı kaydı ve giriş sistemi
+- Yönetici ve normal kullanıcı rolleri
+- Etkinlik oluşturma (yönetici)
+- Etkinlik listeleme
+- Bilet satın alma
+- Bilet görüntüleme
 
-Bu sınıf, etkinliklerin bilgilerini (ad, tarih, mekan) ve bilet işlemlerini (bilet satma, bilet alma) yönetir.
+## Gereksinimler
 
-### Bilet
+- Python 3.x
+- PyQt5
 
-Bu sınıf, bir biletin numarasını ve ilişkili etkinliği tutar.
+## Kurulum
 
-### Kullanici
-
-Bu sınıf, bir kullanıcının adını ve sahip olduğu biletleri yönetir.
-
-## Veri Yapıları
-
-- `etkinlikler` listesi, tüm etkinlik nesnelerini tutar.
-- `kullanicilar` listesi, tüm kullanıcı nesnelerini tutar.
-- `biletler` listesi (Etkinlik sınıfında), bir etkinliğe ait tüm biletleri tutar.
-
-## Arayüz
-
-PyQt5 kütüphanesi kullanılarak bir grafik kullanıcı arayüzü oluşturulmuştur. Arayüz, aşağıdaki bileşenleri içerir:
-
-- Etkinlik listesi: Mevcut etkinlikleri gösterir.
-- Etkinlik ekleme alanları: Yeni bir etkinlik eklemek için ad, tarih ve mekan girişi yapılır.
-- Bilet satış alanı: Bir etkinliğe bilet satmak için bilet numarası girilir.
-- İlgili butonlar: Etkinlik ekleme ve bilet satış işlemlerini gerçekleştirmek için butonlar.
+1. Projeyi klonlayın veya indirin: git clone https://github.com/kullaniciadi/etkinlik-bilet-platformu.git
+2. Gerekli Python kütüphanelerini yükleyin: pip install PyQt5
 
 ## Kullanım
 
-1. Projeyi indirin veya klonlayın.
-2. Terminalde proje dizinine gidin.
-3. `python etkinlikplatform.py` komutunu çalıştırın.
-4. Arayüzden yeni etkinlikler ekleyebilir, bilet satabilir ve etkinlikleri görüntüleyebilirsiniz.
+1. Ana dizinde `etkinlikplatform.py` dosyasını çalıştırın: python etkinlikplatform.py
+2. Giriş ekranından yeni bir hesap oluşturun veya var olan bir hesapla giriş yapın.
 
-## Uygulama görselleri
+3. Normal kullanıcı olarak giriş yaptıysanız, etkinlik listesini ve kendi biletlerinizi görebilirsiniz. Bilet satın almak için istediğiniz etkinliği seçin ve "Bilet Al" butonuna tıklayın.
 
-![image](https://github.com/numyy/Python-pyqt5-Projeleri/assets/148050750/91440049-b6ca-4cba-aa78-d65e0d8b56d5)
+4. Yönetici olarak giriş yaptıysanız, ayrıca yeni etkinlikler oluşturabilir ve mevcut etkinlikleri silebilirsiniz.
 
+## Katkıda Bulunma
+
+Bu proje açık kaynaklıdır ve katkılarınızı memnuniyetle kabul ederiz. Lütfen değişikliklerinizi bir dal (branch) üzerinde yapın ve bir çekme isteği (pull request) gönderin.
+
+## Lisans
+
+Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
+
+## Ekran Resimleri
+![etkinlik1](https://github.com/numyy/Python-pyqt5-Projeleri/assets/148050750/96ccf5bc-c791-4bb7-8201-f6d4f536a851)
+![Screenshot_1](https://github.com/numyy/Python-pyqt5-Projeleri/assets/148050750/b90d4e24-f068-4279-b5fa-83b749405419)
+![Screenshot_2](https://github.com/numyy/Python-pyqt5-Projeleri/assets/148050750/a2c199d7-ac9f-434b-8ad5-ee387a7def54)
