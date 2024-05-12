@@ -40,3 +40,11 @@ Eğer bu projeye katkıda bulunmak isterseniz, lütfen bir "pull request" oluşt
 ## Lisans
 
 Bu proje MIT Lisansı kapsamındadır. Daha fazla bilgi için [LICENSE](LICENSE) dosyasına bakabilirsiniz.
+
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/711daefe-cdb0-4e5e-8939-b1d3f6e1bb1c)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/a0db3e8f-d157-4548-895a-7bc1f0e5a9bc)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/415d7e6e-2cf8-4a33-9457-f0e81e0099e7)
+![image](https://github.com/flydedit/pyqt5_projeleri/assets/95934599/f9425202-b2ac-4d20-8e3b-fa57cb515dbd)
+
+
+
