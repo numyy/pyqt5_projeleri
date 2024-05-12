@@ -60,10 +60,13 @@ class Sporcu:
     def program_bilgileri_getir(self):
         programlar = self.veritabani.programlari_getir()
         program_bilgileri = []
+        gorulmus_programlar = set()  # Görülen programları takip etmek için bir set oluşturun
         for program in programlar:
             if program[1] == self.ad and program[2] == self.soyad:
                 program_bilgisi = f"{program[0]} - {program[1]} {program[2]} - {program[3]} - {program[4]}"
-                program_bilgileri.append(program_bilgisi)
+                if program_bilgisi not in gorulmus_programlar:  # Programa daha önce eklenmemişse ekleyin
+                    program_bilgileri.append(program_bilgisi)
+                    gorulmus_programlar.add(program_bilgisi)
         return program_bilgileri
 
     def ilerleme_kaydet_dialog(self):
@@ -237,10 +240,6 @@ class AnaUygulama(QMainWindow):
             program_olustur_button.clicked.connect(self.program_olustur_dialog)
             layout.addWidget(program_olustur_button)
 
-            ilerleme_kaydet_button = QPushButton("İlerleme Kaydet")
-            ilerleme_kaydet_button.clicked.connect(lambda: self.get_sporcu(ad, soyad).ilerleme_kaydet_dialog())
-            layout.addWidget(ilerleme_kaydet_button)
-
             rapor_al_button = QPushButton("Rapor Al")
             rapor_al_button.clicked.connect(self.rapor_al_dialog)
             layout.addWidget(rapor_al_button)
@@ -370,14 +369,7 @@ class AnaUygulama(QMainWindow):
         else:
             QMessageBox.warning(self, "Uyarı", "Lütfen önce bir sporcu seçin.")
 
-        if secili_item:
-            secili_sporcu = secili_item.text().split(" - ")
-            ad_soyad, yas, spor_dali = secili_sporcu
-            ad, soyad = ad_soyad.split()
-            sporcu = self.get_sporcu(ad, soyad)
-            program_bilgileri = sporcu.program_bilgileri_getir()
-            if program_bilgileri:
-                self.rapor_goster(program_bilgileri[0], rapor_label)
+
 
     def program_olustur(self, sporcu, program_adi, spor_dali, antrenman_suresi):
         program = sporcu.program_olustur(program_adi, spor_dali, antrenman_suresi)
