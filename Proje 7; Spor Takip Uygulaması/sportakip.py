@@ -37,15 +37,34 @@ class Sporcu:
         for program in self.antrenman_programlari:
             if program.program_adi == program_adi:
                 rapor += str(program) + "\n\nAntrenmanlar:\n"
-                for antrenman in program.antrenmanlar:
-                    rapor += f"- {antrenman.antrenman_adi}\n  Detaylar: {antrenman.detaylar}\n  Süre: {antrenman.sure} saat\n"
+                if not program.antrenmanlar:
+                    rapor += "Bu program için henüz antrenman eklenmemiş.\n"
+                else:
+                    for antrenman in program.antrenmanlar:
+                        rapor += f"- {antrenman.antrenman_adi}\n  Detaylar: {antrenman.detaylar}\n  Süre: {antrenman.sure} saat\n"
                 rapor += "\nTakip Bilgileri:\n"
-                for takip in program.takip_listesi:
-                    rapor += "Antrenman: {0}\nİlerleme: {1}\n".format(
-                        takip.antrenman.antrenman_adi, takip.ilerleme_kaydi)
+                if not program.takip_listesi:
+                    rapor += "Bu program için henüz ilerleme kaydedilmemiş.\n"
+                else:
+                    for takip in program.takip_listesi:
+                        rapor += "Antrenman: {0}\nİlerleme: {1}\n".format(
+                            takip.antrenman.antrenman_adi, takip.ilerleme_kaydi)
                 break
         return rapor
 
+    def programlari_getir(self):
+        self.imlec.execute(
+            "SELECT program_adi, sporcu_ad, sporcu_soyad, spor_dali, antrenman_suresi FROM antrenman_programlari")
+        return self.imlec.fetchall()
+
+    def program_bilgileri_getir(self):
+        programlar = self.veritabani.programlari_getir()
+        program_bilgileri = []
+        for program in programlar:
+            if program[1] == self.ad and program[2] == self.soyad:
+                program_bilgisi = f"{program[0]} - {program[1]} {program[2]} - {program[3]} - {program[4]}"
+                program_bilgileri.append(program_bilgisi)
+        return program_bilgileri
 
     def ilerleme_kaydet_dialog(self):
         dialog = QDialog(self)
@@ -300,14 +319,25 @@ class AnaUygulama(QMainWindow):
             layout.addWidget(antrenman_suresi_edit)
 
             kaydet_button = QPushButton("Kaydet")
+            # Program adının benzersiz olup olmadığını kontrol et
             kaydet_button.clicked.connect(
-                lambda: self.program_olustur(sporcu, program_adi_edit.text(), spor_dali_combo.currentText(),
-                                             int(antrenman_suresi_edit.text())))
+                lambda: self.program_olustur_kontrol(sporcu, program_adi_edit.text(), spor_dali_combo.currentText(),
+                                                     int(antrenman_suresi_edit.text())))
             layout.addWidget(kaydet_button)
 
             dialog.exec_()
         else:
             QMessageBox.warning(self, "Uyarı", "Lütfen önce bir sporcu seçin.")
+
+    def program_olustur_kontrol(self, sporcu, program_adi, spor_dali, antrenman_suresi):
+        programlar = self.veritabani.programlari_getir()
+        program_adlari = [program[0] for program in programlar]
+
+        if program_adi in program_adlari:
+            QMessageBox.warning(self, "Uyarı",
+                                f"{program_adi} adlı bir program zaten mevcut. Lütfen farklı bir ad girin.")
+        else:
+            self.program_olustur(sporcu, program_adi, spor_dali, antrenman_suresi)
 
     def rapor_al_dialog(self):
         secili_item = self.sporcular_list.currentItem()
@@ -325,19 +355,29 @@ class AnaUygulama(QMainWindow):
             program_label = QLabel("Program:")
             layout.addWidget(program_label)
             program_combo = QComboBox()
-            program_combo.addItems([program.program_adi for program in sporcu.antrenman_programlari])
+            program_bilgileri = sporcu.program_bilgileri_getir()
+            program_combo.addItems(program_bilgileri)
             layout.addWidget(program_combo)
 
             rapor_label = QLabel("")
             layout.addWidget(rapor_label)
 
             rapor_button = QPushButton("Rapor Al")
-            rapor_button.clicked.connect(lambda: rapor_label.setText(sporcu.rapor_al(program_combo.currentText())))
+            rapor_button.clicked.connect(lambda: self.rapor_goster(program_combo.currentText(), rapor_label))
             layout.addWidget(rapor_button)
 
             dialog.exec_()
         else:
             QMessageBox.warning(self, "Uyarı", "Lütfen önce bir sporcu seçin.")
+
+        if secili_item:
+            secili_sporcu = secili_item.text().split(" - ")
+            ad_soyad, yas, spor_dali = secili_sporcu
+            ad, soyad = ad_soyad.split()
+            sporcu = self.get_sporcu(ad, soyad)
+            program_bilgileri = sporcu.program_bilgileri_getir()
+            if program_bilgileri:
+                self.rapor_goster(program_bilgileri[0], rapor_label)
 
     def program_olustur(self, sporcu, program_adi, spor_dali, antrenman_suresi):
         program = sporcu.program_olustur(program_adi, spor_dali, antrenman_suresi)
@@ -346,6 +386,19 @@ class AnaUygulama(QMainWindow):
         dialog = self.findChild(QDialog)
         if dialog:
             dialog.done(QDialog.Accepted)
+
+    def rapor_goster(self, program_bilgisi, rapor_label):
+        program_adi, ad_soyad, spor_dali, antrenman_suresi = program_bilgisi.split(" - ")
+        ad, soyad = ad_soyad.split()
+        sporcu = self.get_sporcu(ad, soyad)
+        rapor = ""
+        for program in sporcu.antrenman_programlari:
+            if program.program_adi == program_adi:
+                rapor = sporcu.rapor_al(program_adi)
+                break
+        rapor_label.setText(rapor)
+
+
 
 if __name__ == "__main__":
     import sys
