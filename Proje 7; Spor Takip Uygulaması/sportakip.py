@@ -31,24 +31,25 @@ class Sporcu:
     def ilerleme_kaydet(self, program, antrenman, ilerleme):
         takip = Takip(self, antrenman, ilerleme)
         program.takip_listesi.append(takip)
+        self.veritabani.ilerleme_kaydet(self.ad, self.soyad, antrenman.antrenman_adi, program.program_adi, ilerleme)
 
     def rapor_al(self, program_adi):
         rapor = ""
         for program in self.antrenman_programlari:
             if program.program_adi == program_adi:
                 rapor += str(program) + "\n\nAntrenmanlar:\n"
-                if not program.antrenmanlar:
-                    rapor += "Bu program için henüz antrenman eklenmemiş.\n"
-                else:
+                if program.antrenmanlar:
                     for antrenman in program.antrenmanlar:
                         rapor += f"- {antrenman.antrenman_adi}\n  Detaylar: {antrenman.detaylar}\n  Süre: {antrenman.sure} saat\n"
-                rapor += "\nTakip Bilgileri:\n"
-                if not program.takip_listesi:
-                    rapor += "Bu program için henüz ilerleme kaydedilmemiş.\n"
                 else:
+                    rapor += "Bu program için henüz antrenman eklenmemiş.\n"
+                rapor += "\nTakip Bilgileri:\n"
+                if program.takip_listesi:
                     for takip in program.takip_listesi:
                         rapor += "Antrenman: {0}\nİlerleme: {1}\n".format(
                             takip.antrenman.antrenman_adi, takip.ilerleme_kaydi)
+                else:
+                    rapor += "Bu program için henüz ilerleme kaydedilmemiş.\n"
                 break
         return rapor
 
@@ -223,11 +224,13 @@ class AnaUygulama(QMainWindow):
 
             self.sporcu_bilgi_penceresi = QDialog(self)
             self.sporcu_bilgi_penceresi.setWindowTitle("Sporcu Bilgileri")
+            self.sporcu_bilgi_penceresi.setMinimumSize(400, 300)  # Pencere boyutunu ayarlayın
             layout = QVBoxLayout()
             self.sporcu_bilgi_penceresi.setLayout(layout)
 
             ad, soyad = ad_soyad.split()  # ad ve soyadı ayır
             ad_soyad_label = QLabel(f"Ad Soyad: {ad} {soyad}")
+            ad_soyad_label.setStyleSheet("font-size: 16px;")  # Yazı boyutu
             yas_label = QLabel(f"Yaş: {yas}")
             spor_dali_label = QLabel(f"Spor Dalı: {spor_dali}")
 
@@ -347,7 +350,7 @@ class AnaUygulama(QMainWindow):
             sporcu = self.get_sporcu(ad, soyad)
 
             dialog = QDialog(self)
-            dialog.setWindowTitle("Rapor Al")
+            dialog.setWindowTitle("Rapor Göster")
             layout = QVBoxLayout()
             dialog.setLayout(layout)
 
@@ -361,7 +364,7 @@ class AnaUygulama(QMainWindow):
             rapor_label = QLabel("")
             layout.addWidget(rapor_label)
 
-            rapor_button = QPushButton("Rapor Al")
+            rapor_button = QPushButton("Rapor Göster")
             rapor_button.clicked.connect(lambda: self.rapor_goster(program_combo.currentText(), rapor_label))
             layout.addWidget(rapor_button)
 
