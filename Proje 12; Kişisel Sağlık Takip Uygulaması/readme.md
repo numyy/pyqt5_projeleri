@@ -10,12 +10,26 @@ Bu Python projesi, kullanıcıların sağlık verilerini kaydedebilmelerine, egz
 - Kullanıcının sağlık kayıtlarını ve egzersiz rutinlerini görüntüleme
 - Kullanıcı bilgileri, sağlık kayıtları ve egzersiz verilerinin bir raporunu oluşturma
 
+## Gereksinimler
+
+- Python 3.x
+- PyQt5
+- QtWidgets
+
 ## Kurulum
 
 1. Projeyi klonlayın veya indirin:
 2. Proje dosyasını pyhton modüllerini destekleyen bir uygulamada açın.
 3. Proje dosyası için gereken kütüphaneleri uygulama içi yükleyin.
 4. kisiselsaglik.py dosyasını çalıştırarak uygulamayı kullanabilirsiniz.
+
+## Katkıda Bulunma
+
+Bu proje açık kaynaklıdır ve katkılarınızı memnuniyetle kabul ederiz. Lütfen değişikliklerinizi bir dal (branch) üzerinde yapın ve bir çekme isteği (pull request) gönderin.
+
+## Lisans
+
+Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 
 ##Uygulama Resimleri
 
